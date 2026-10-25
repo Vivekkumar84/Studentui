@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Portal - Register</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <span class="brand">🎓 Student Portal</span>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="register.html" class="active">Register</a>
+      <a href="students.html">Students</a>
+    </div>
+  </nav>
+  <main class="container">
+    <div class="card">
+      <h2>Student Registration Form</h2>
+      <form id="regForm" novalidate>
+
+        <div class="field">
+          <label>Full Name <input name="name" placeholder="Rahul Sharma" /></label>
+          <small class="err">Name required hai (min 3 characters)</small>
+        </div>
+
+        <div class="field">
+          <label>Email <input type="email" name="email" placeholder="rahul@example.com" /></label>
+          <small class="err">Valid email daalo</small>
+        </div>
+
+        <div class="field">
+          <label>Phone <input name="phone" placeholder="10 digit number" maxlength="10" /></label>
+          <small class="err">10 digit phone number daalo</small>
+        </div>
+
+        <div class="field">
+          <label>Date of Birth <input type="date" name="dob" /></label>
+          <small class="err">DOB required hai</small>
+        </div>
+
+        <div class="field" data-radio="gender">
+          <label>Gender</label>
+          <label class="inline"><input type="radio" name="gender" value="Male" /> Male</label>
+          <label class="inline"><input type="radio" name="gender" value="Female" /> Female</label>
+          <label class="inline"><input type="radio" name="gender" value="Other" /> Other</label>
+          <small class="err">Gender select karo</small>
+        </div>
+
+        <div class="field">
+          <label>Course
+            <select name="course">
+              <option value="">-- Select Course --</option>
+              <option>B.Tech</option><option>BCA</option><option>MCA</option>
+              <option>B.Sc</option><option>MBA</option>
+            </select>
+          </label>
+          <small class="err">Course select karo</small>
+        </div>
+
+        <div class="field">
+          <label>Address <textarea name="address" rows="3"></textarea></label>
+          <small class="err">Address required hai</small>
+        </div>
+
+        <div class="row">
+          <button type="submit" class="btn">Submit</button>
+          <button type="reset" class="btn secondary">Reset</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById('regForm');
+
+    const rules = {
+      name:    v => v.trim().length >= 3,
+      email:   v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+      phone:   v => /^[0-9]{10}$/.test(v),
+      dob:     v => v !== '',
+      gender:  v => v !== '',
+      course:  v => v !== '',
+      address: v => v.trim() !== '',
+    };
+
+    function getValue(name) {
+      if (name === 'gender') {
+        const r = form.querySelector('input[name=gender]:checked');
+        return r ? r.value : '';
+      }
+      return form.elements[name].value;
+    }
+
+    function validate() {
+      let ok = true;
+      for (const name in rules) {
+        const field = form.elements[name]
+          ? (form.elements[name].closest ? form.elements[name].closest('.field')
+                                         : form.elements[name][0].closest('.field'))
+          : null;
+        const valid = rules[name](getValue(name));
+        field.classList.toggle('invalid', !valid);
+        if (!valid) ok = false;
+      }
+      return ok;
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      if (!validate()) return;
+      const student = {};
+      for (const name in rules) student[name] = getValue(name).trim();
+      const list = JSON.parse(localStorage.getItem('students') || '[]');
+      list.push(student);
+      localStorage.setItem('students', JSON.stringify(list));
+      window.location.href = 'students.html';
+    });
+
+    form.addEventListener('reset', () => {
+      document.querySelectorAll('.field').forEach(f => f.classList.remove('invalid'));
+    });
+  </script>
+</body>
+</html>

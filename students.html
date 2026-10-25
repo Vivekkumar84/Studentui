@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Portal - Students</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <span class="brand">🎓 Student Portal</span>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="register.html">Register</a>
+      <a href="students.html" class="active">Students</a>
+    </div>
+  </nav>
+  <main class="container">
+    <div class="card">
+      <h2>Registered Students (<span id="count">0</span>)</h2>
+      <div id="content"></div>
+    </div>
+  </main>
+
+  <script>
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function render() {
+      const list = JSON.parse(localStorage.getItem('students') || '[]');
+      document.getElementById('count').textContent = list.length;
+      const box = document.getElementById('content');
+
+      if (list.length === 0) {
+        box.innerHTML = '<p>Abhi koi student register nahi hua. <a href="register.html">Register karo</a></p>';
+        return;
+      }
+
+      box.innerHTML = `
+        <div class="table-wrap"><table>
+          <thead><tr>
+            <th>#</th><th>Name</th><th>Email</th><th>Phone</th>
+            <th>DOB</th><th>Gender</th><th>Course</th><th>Address</th><th></th>
+          </tr></thead>
+          <tbody>
+            ${list.map((s, i) => `
+              <tr>
+                <td>${i + 1}</td><td>${esc(s.name)}</td><td>${esc(s.email)}</td>
+                <td>${esc(s.phone)}</td><td>${esc(s.dob)}</td><td>${esc(s.gender)}</td>
+                <td>${esc(s.course)}</td><td>${esc(s.address)}</td>
+                <td><button class="btn danger" onclick="removeStudent(${i})">Delete</button></td>
+              </tr>`).join('')}
+          </tbody>
+        </table></div>`;
+    }
+
+    function removeStudent(i) {
+      const list = JSON.parse(localStorage.getItem('students') || '[]');
+      list.splice(i, 1);
+      localStorage.setItem('students', JSON.stringify(list));
+      render();
+    }
+
+    render();
+  </script>
+</body>
+</html>
